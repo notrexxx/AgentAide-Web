@@ -1,11 +1,27 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import Image from "next/image";
 
 export default function PropertyGallery({ images, propertyName }: { images: string[], propertyName: string }) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
-  // Allow users to use keyboard arrows and Escape key
+  // 1. Move functions ABOVE the useEffect and wrap in useCallback
+  const nextImage = useCallback(() => {
+    setSelectedIndex((prevIndex) => {
+      if (prevIndex === null) return null;
+      return (prevIndex + 1) % images.length;
+    });
+  }, [images.length]);
+
+  const prevImage = useCallback(() => {
+    setSelectedIndex((prevIndex) => {
+      if (prevIndex === null) return null;
+      return (prevIndex - 1 + images.length) % images.length;
+    });
+  }, [images.length]);
+
+  // 2. useEffect now safely references the declared functions
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (selectedIndex === null) return;
@@ -15,45 +31,34 @@ export default function PropertyGallery({ images, propertyName }: { images: stri
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [selectedIndex, images.length]);
-
-  const nextImage = () => {
-    if (selectedIndex !== null) {
-      setSelectedIndex((selectedIndex + 1) % images.length);
-    }
-  };
-
-  const prevImage = () => {
-    if (selectedIndex !== null) {
-      setSelectedIndex((selectedIndex - 1 + images.length) % images.length);
-    }
-  };
+  }, [selectedIndex, nextImage, prevImage]); // 3. Added missing dependencies
 
   if (!images || images.length === 0) return null;
 
   return (
-    <div className="border-t border-slate-100 pt-10 mt-4">
+    <div 
+      className="opacity-0 animate-fade-in-up border-t border-slate-100 pt-10 mt-4"
+      style={{ animationDelay: '600ms' }}
+    >
       <h2 className="text-2xl font-bold text-foreground mb-8 flex items-center gap-2">
         <span className="w-8 h-1 bg-secondary rounded-full"></span>
         Property Gallery
       </h2>
       
-      {/* Symmetrical CSS Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
         {images.map((url, index) => (
           <div 
             key={index} 
             onClick={() => setSelectedIndex(index)}
-            // aspect-[4/3] forces a perfect rectangle. object-cover inside it prevents stretching.
-            className="relative w-full aspect-4/3 bg-slate-100 rounded-2xl overflow-hidden group shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer"
+            className="relative w-full aspect-[4/3] bg-slate-100 rounded-2xl overflow-hidden group shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer"
           >
-            <img 
+            <Image 
               src={url} 
-              alt={`${propertyName} Image ${index + 1}`} 
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-in-out"
-              loading="lazy"
+              alt={`${propertyName} Image ${index + 1}`}
+              fill
+              sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
+              className="object-cover group-hover:scale-105 transition-transform duration-500 ease-in-out"
             />
-            {/* Hover overlay hint */}
             <div className="absolute inset-0 bg-black/0 group-hover:bg-slate-900/15 transition-colors duration-300 flex items-center justify-center">
                <span className="bg-white/95 text-slate-800 text-sm font-semibold py-2 px-5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-md shadow-lg flex items-center gap-2">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" /></svg>
@@ -64,7 +69,6 @@ export default function PropertyGallery({ images, propertyName }: { images: stri
         ))}
       </div>
 
-      {/* Full-Screen Lightbox Modal (Remains exactly the same) */}
       {selectedIndex !== null && (
         <div 
           className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/95 backdrop-blur-xl transition-opacity"
@@ -85,13 +89,16 @@ export default function PropertyGallery({ images, propertyName }: { images: stri
            </button>
 
            <div 
-             className="relative max-w-[90vw] max-h-[85vh]"
+             className="relative w-[90vw] h-[85vh]"
              onClick={(e) => e.stopPropagation()} 
            >
-             <img 
+             <Image 
                src={images[selectedIndex]} 
                alt={`${propertyName} Full Image`}
-               className="max-h-[85vh] max-w-[90vw] object-contain rounded-lg shadow-2xl"
+               fill
+               priority 
+               sizes="90vw"
+               className="object-contain drop-shadow-2xl"
              />
            </div>
 
