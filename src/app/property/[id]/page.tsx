@@ -18,14 +18,33 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return { title: 'Property Not Found' };
   }
 
+  // Ensure absolute URLs for social scrapers. 
+  // Fallback to localhost for dev, but use your Vercel URL in production
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://agent-aide-web.vercel.app';
+
   return {
     title: `${data.name} | AgentAide`,
     description: data.description || 'View this exclusive property dossier.',
     openGraph: {
       title: data.name,
       description: data.description || 'View this exclusive property dossier.',
-      images: data.cover_image_url ? [data.cover_image_url] : [],
+      url: `${baseUrl}/property/${resolvedParams.id}`,
+      siteName: 'AgentAide',
+      images: data.cover_image_url ? [
+        {
+          url: data.cover_image_url,
+          width: 1200, // WhatsApp/Facebook explicit dimension hint
+          height: 630, // WhatsApp/Facebook explicit dimension hint
+          alt: `Cover image for ${data.name}`,
+        }
+      ] : [],
       type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: data.name,
+      description: data.description || 'View this exclusive property dossier.',
+      images: data.cover_image_url ? [data.cover_image_url] : [],
     },
   };
 }
