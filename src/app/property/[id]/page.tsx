@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
+import Image from 'next/image'; // 🚨 IMPORTED NEXT/IMAGE
 import { supabase } from '@/lib/supabase';
-// Import our new Client Component
 import PropertyGallery from '@/components/PropertyGallery';
 
 type Props = {
@@ -69,15 +69,18 @@ export default async function PropertyDossier({ params }: Props) {
   return (
     <main className="min-h-screen bg-background pb-20">
       
-      {/* Edge-to-Edge Hero Banner with Soft Gradient Overlay */}
+      {/* Edge-to-Edge Hero Banner with Next/Image */}
       {data.cover_image_url ? (
         <div className="w-full h-[45vh] md:h-[55vh] relative bg-slate-200">
-          <img 
+          <Image 
             src={data.cover_image_url} 
-            alt={data.name} 
-            className="w-full h-full object-cover"
+            alt={data.name}
+            fill
+            priority // Tells Next.js to load this instantly, ignoring lazy-loading
+            sizes="100vw"
+            className="object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-90" />
+          <div className="absolute inset-0 bg-linear-to-t from-background via-transparent to-transparent opacity-90" />
         </div>
       ) : (
         <div className="w-full h-[35vh] bg-slate-200 flex items-center justify-center">
@@ -139,7 +142,6 @@ export default async function PropertyDossier({ params }: Props) {
             </p>
           </div>
 
-          {/* The New Interactive Client Component */}
           <PropertyGallery images={data.gallery_urls} propertyName={data.name} />
 
         </div>
