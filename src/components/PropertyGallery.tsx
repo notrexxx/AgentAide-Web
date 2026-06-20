@@ -44,8 +44,8 @@ export default function PropertyGallery({ images, propertyName }: { images: stri
           <div 
             key={index} 
             onClick={() => setSelectedIndex(index)}
-            // aspect-[4/3] forces a perfect rectangle. object-cover inside it prevents stretching.
-            className="relative w-full aspect-[4/3] bg-slate-100 rounded-2xl overflow-hidden group shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer"
+            // aspect-4/3 forces a perfect rectangle. object-cover inside it prevents stretching.
+            className="relative w-full aspect-4/3 bg-slate-100 rounded-2xl overflow-hidden group shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer"
           >
             <img 
               src={url} 
