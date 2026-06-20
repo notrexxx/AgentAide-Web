@@ -1,5 +1,7 @@
 import { Metadata } from 'next';
 import { supabase } from '@/lib/supabase';
+// Import our new Client Component
+import PropertyGallery from '@/components/PropertyGallery';
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -18,8 +20,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return { title: 'Property Not Found' };
   }
 
-  // Ensure absolute URLs for social scrapers. 
-  // Fallback to localhost for dev, but use your Vercel URL in production
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://agent-aide-web.vercel.app';
 
   return {
@@ -33,8 +33,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       images: data.og_thumbnail_url ? [
         {
           url: data.og_thumbnail_url,
-          width: 1200, // WhatsApp/Facebook explicit dimension hint
-          height: 630, // WhatsApp/Facebook explicit dimension hint
+          width: 1200, 
+          height: 630, 
           alt: `Cover image for ${data.name}`,
         }
       ] : [],
@@ -77,7 +77,6 @@ export default async function PropertyDossier({ params }: Props) {
             alt={data.name} 
             className="w-full h-full object-cover"
           />
-          {/* Subtle bottom gradient to blend the image into the background */}
           <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-90" />
         </div>
       ) : (
@@ -101,7 +100,6 @@ export default async function PropertyDossier({ params }: Props) {
               </p>
             </div>
             
-            {/* Optional Call to Action / Price placeholder if needed in the future */}
             <div className="hidden md:block">
                <div className="bg-primary/10 text-primary px-6 py-3 rounded-full font-bold tracking-wide">
                   Verified Property
@@ -141,28 +139,8 @@ export default async function PropertyDossier({ params }: Props) {
             </p>
           </div>
 
-          {/* Modern Masonry-style Image Gallery */}
-          {data.gallery_urls && data.gallery_urls.length > 0 && (
-            <div className="border-t border-slate-100 pt-10 mt-4">
-              <h2 className="text-2xl font-bold text-foreground mb-8 flex items-center gap-2">
-                <span className="w-8 h-1 bg-secondary rounded-full"></span>
-                Property Gallery
-              </h2>
-              {/* Using auto-rows-min and columns for a more dynamic look */}
-              <div className="columns-1 sm:columns-2 gap-4 space-y-4">
-                {data.gallery_urls.map((url: string, index: number) => (
-                  <div key={index} className="w-full relative bg-slate-100 rounded-2xl overflow-hidden group break-inside-avoid shadow-sm hover:shadow-md transition-shadow duration-300">
-                    <img 
-                      src={url} 
-                      alt={`${data.name} Gallery Image ${index + 1}`} 
-                      className="w-full object-cover group-hover:scale-[1.02] transition-transform duration-500 ease-in-out"
-                      loading="lazy"
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+          {/* The New Interactive Client Component */}
+          <PropertyGallery images={data.gallery_urls} propertyName={data.name} />
 
         </div>
       </div>
