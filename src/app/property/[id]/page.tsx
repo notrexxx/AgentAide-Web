@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import Image from 'next/image'; // 🚨 IMPORTED NEXT/IMAGE
+import Image from 'next/image';
 import { supabase } from '@/lib/supabase';
 import PropertyGallery from '@/components/PropertyGallery';
 
@@ -69,14 +69,14 @@ export default async function PropertyDossier({ params }: Props) {
   return (
     <main className="min-h-screen bg-background pb-20">
       
-      {/* Edge-to-Edge Hero Banner with Next/Image */}
+      {/* Edge-to-Edge Hero Banner */}
       {data.cover_image_url ? (
         <div className="w-full h-[45vh] md:h-[55vh] relative bg-slate-200">
           <Image 
             src={data.cover_image_url} 
             alt={data.name}
             fill
-            priority // Tells Next.js to load this instantly, ignoring lazy-loading
+            priority
             sizes="100vw"
             className="object-cover"
           />
@@ -92,7 +92,11 @@ export default async function PropertyDossier({ params }: Props) {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 -mt-24 relative z-10">
         <div className="bg-surface rounded-3xl shadow-glass p-8 md:p-12 border border-slate-100">
           
-          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6 mb-8">
+          {/* Header Section - Fades in first */}
+          <div 
+            className="opacity-0 animate-fade-in-up flex flex-col md:flex-row md:items-start md:justify-between gap-6 mb-8"
+            style={{ animationDelay: '150ms' }}
+          >
             <div>
               <h1 className="text-4xl md:text-5xl font-extrabold text-foreground tracking-tight mb-3">
                 {data.name}
@@ -110,8 +114,11 @@ export default async function PropertyDossier({ params }: Props) {
             </div>
           </div>
 
-          {/* Premium Quick Stats Grid */}
-          <div className="grid grid-cols-3 gap-4 md:gap-6 mb-12">
+          {/* Premium Quick Stats Grid - Fades in second */}
+          <div 
+            className="opacity-0 animate-fade-in-up grid grid-cols-3 gap-4 md:gap-6 mb-12"
+            style={{ animationDelay: '300ms' }}
+          >
             <div className="bg-background/50 p-6 rounded-2xl text-center border border-slate-100 hover:border-primary/20 hover:bg-white transition-all duration-300">
               <div className="text-3xl mb-2">🛏️</div>
               <div className="text-2xl font-bold text-foreground">{data.rooms_count || 0}</div>
@@ -131,8 +138,11 @@ export default async function PropertyDossier({ params }: Props) {
             </div>
           </div>
 
-          {/* Elegant Description Section */}
-          <div className="pt-2 pb-8">
+          {/* Elegant Description Section - Fades in third */}
+          <div 
+            className="opacity-0 animate-fade-in-up pt-2 pb-8"
+            style={{ animationDelay: '450ms' }}
+          >
             <h2 className="text-2xl font-bold text-foreground mb-5 flex items-center gap-2">
               <span className="w-8 h-1 bg-primary rounded-full"></span>
               About this property
@@ -142,6 +152,7 @@ export default async function PropertyDossier({ params }: Props) {
             </p>
           </div>
 
+          {/* The Interactive Client Component - Animation handled inside */}
           <PropertyGallery images={data.gallery_urls} propertyName={data.name} />
 
         </div>
