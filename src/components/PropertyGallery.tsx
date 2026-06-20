@@ -1,27 +1,11 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 
 export default function PropertyGallery({ images, propertyName }: { images: string[], propertyName: string }) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
-  // 1. Move functions ABOVE the useEffect and wrap in useCallback
-  const nextImage = useCallback(() => {
-    setSelectedIndex((prevIndex) => {
-      if (prevIndex === null) return null;
-      return (prevIndex + 1) % images.length;
-    });
-  }, [images.length]);
-
-  const prevImage = useCallback(() => {
-    setSelectedIndex((prevIndex) => {
-      if (prevIndex === null) return null;
-      return (prevIndex - 1 + images.length) % images.length;
-    });
-  }, [images.length]);
-
-  // 2. useEffect now safely references the declared functions
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (selectedIndex === null) return;
@@ -31,11 +15,24 @@ export default function PropertyGallery({ images, propertyName }: { images: stri
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [selectedIndex, nextImage, prevImage]); // 3. Added missing dependencies
+  }, [selectedIndex, images.length]);
+
+  const nextImage = () => {
+    if (selectedIndex !== null) {
+      setSelectedIndex((selectedIndex + 1) % images.length);
+    }
+  };
+
+  const prevImage = () => {
+    if (selectedIndex !== null) {
+      setSelectedIndex((selectedIndex - 1 + images.length) % images.length);
+    }
+  };
 
   if (!images || images.length === 0) return null;
 
   return (
+    // 🚨 Added the fade-in animation to the main gallery container with a 600ms delay
     <div 
       className="opacity-0 animate-fade-in-up border-t border-slate-100 pt-10 mt-4"
       style={{ animationDelay: '600ms' }}
@@ -45,6 +42,7 @@ export default function PropertyGallery({ images, propertyName }: { images: stri
         Property Gallery
       </h2>
       
+      {/* Symmetrical CSS Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
         {images.map((url, index) => (
           <div 
@@ -69,6 +67,7 @@ export default function PropertyGallery({ images, propertyName }: { images: stri
         ))}
       </div>
 
+      {/* Full-Screen Lightbox Modal */}
       {selectedIndex !== null && (
         <div 
           className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/95 backdrop-blur-xl transition-opacity"
