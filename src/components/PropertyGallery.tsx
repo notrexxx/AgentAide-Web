@@ -50,7 +50,7 @@ export default function PropertyGallery({ images, propertyName }: { images: stri
           <div 
             key={index} 
             onClick={() => setSelectedIndex(index)}
-            className="relative w-full aspect-[4/3] bg-slate-100 rounded-2xl overflow-hidden group shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer"
+            className="relative w-full aspect-4/3 bg-slate-100 rounded-2xl overflow-hidden group shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer"
           >
             <Image 
               src={url} 
